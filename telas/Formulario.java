@@ -3,8 +3,9 @@ package telas;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
-import funcoes.Gravar;
 import java.awt.event.ActionEvent;
+
+import funcoes.Gravar;
 
 public class Formulario extends JPanel {
     private Janela janela;
@@ -33,6 +34,7 @@ public class Formulario extends JPanel {
     KeyStroke contaCorrente = KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.ALT_DOWN_MASK);
     KeyStroke contaPoupanca = KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.ALT_DOWN_MASK);
     KeyStroke cadastrar = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
+    KeyStroke consultar = KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK);
 
     // Atributos do Painel
     JLabel jlAgencia = new JLabel();
@@ -155,6 +157,8 @@ public class Formulario extends JPanel {
         jbConsultar.addActionListener(_ -> {
             janela.mostrarVisualizacao();
         });
+        jbConsultar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(consultar, "vizualizar");
+        jbConsultar.getActionMap().put("vizualizar", consultar_Action);
         add(jbConsultar);
 
         jbCadastrar.setBounds(210, 225, 100, 23);
@@ -170,7 +174,21 @@ public class Formulario extends JPanel {
             String tipoConta = jrbCorrente.isSelected() ? "Conta Corrente" : "Conta Poupança";
 
             Gravar gravar = new Gravar();
-            gravar.cadastrarCliente(nome, endereco, telefone, cpf, agencia, numero, saldo, tipoConta);
+            boolean sucesso = gravar.cadastrarCliente(nome, endereco, telefone, cpf, agencia, numero, saldo, tipoConta);
+
+            if (sucesso) {
+                JOptionPane.showMessageDialog(this, "Cadastro realizado com sucesso!");
+
+                // Limpar os campos
+                jtfNome.setText("");
+                jtfEndereco.setText("");
+                jtfTelefone.setValue(null);
+                jtfCpf.setValue(null);
+                jtfAgencia.setValue(null);
+                jtfConta.setValue(null);
+                jtfSaldo.setValue(null);
+                jrbCorrente.setSelected(true);
+            }
         });
         jbCadastrar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(cadastrar, "gravar");
         jbCadastrar.getActionMap().put("gravar", cadastrar_Action);
@@ -200,5 +218,11 @@ public class Formulario extends JPanel {
         }
     };
 
-    // Falta as ações dos botões
+    Action consultar_Action = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            jbConsultar.doClick();
+        }
+    };
+
 }

@@ -36,6 +36,7 @@ public class Janela extends JFrame {
     }
 
     public void mostrarVisualizacao() {
+        visualizacao.atualizarListaClientes(); // <-- garante atualização
         cardLayout.show(getContentPane(), "visualizacao");
     }
 

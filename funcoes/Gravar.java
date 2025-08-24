@@ -35,9 +35,6 @@ public class Gravar {
 
         Cliente cliente = new Cliente(nome, endereco, telefone, cpf, conta);
         listaClientes.add(cliente);
-
-        JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!", "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 
