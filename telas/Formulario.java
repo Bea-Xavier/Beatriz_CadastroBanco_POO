@@ -154,7 +154,7 @@ public class Formulario extends JPanel {
 
         jbConsultar.setBounds(80, 225, 100, 23);
         // Ação do botão Consultar
-        jbConsultar.addActionListener(e -> {
+        jbConsultar.addActionListener(_ -> {
             janela.mostrarVisualizacao();
         });
         jbConsultar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(consultar, "vizualizar");
@@ -163,7 +163,7 @@ public class Formulario extends JPanel {
 
         jbCadastrar.setBounds(210, 225, 100, 23);
         // Ação do botão Cadastrar
-        jbCadastrar.addActionListener(e -> {
+        jbCadastrar.addActionListener(_ -> {
             String nome = jtfNome.getText();
             String endereco = jtfEndereco.getText();
             String telefone = jtfTelefone.getText();

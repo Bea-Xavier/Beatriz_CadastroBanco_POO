@@ -5,16 +5,11 @@ import funcoes.Excluir;
 import funcoes.Gravar;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
-
+import java.awt.*;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.KeyEvent;
 import objetos.usuarios.Cliente;
 import objetos.contas.ContaCorrente;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import java.awt.event.KeyEvent;
 
 public class Visualizacao extends JPanel {
     private Janela janela;
@@ -23,9 +18,8 @@ public class Visualizacao extends JPanel {
     JPanel painelSuperior = new JPanel();
     JPanel painelInfo = new JPanel();
 
-    // Mascáras para os campos númericos
+    // Máscaras
     MaskFormatter mascaraAgencia, mascaraConta, mascaraTelefone, mascaraCpf, mascaraSaldo;
-
     {
         try {
             mascaraAgencia = new MaskFormatter("####");
@@ -45,18 +39,18 @@ public class Visualizacao extends JPanel {
 
     KeyStroke voltar = KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.ALT_DOWN_MASK);
 
-    // Atributos
+    // Cabeçalho
     JLabel jlTitulo = new JLabel("Consulta de Cadastro");
     JLabel jlInfo = new JLabel("Escolha o nome do cliente:");
-    JComboBox<String> jcbNomes = new JComboBox<String>();
+    JComboBox<String> jcbNomes = new JComboBox<>();
 
-    // Botões de Funcionalidades
+    // Botões
     JButton jbVoltar = new JButton("Voltar");
     JButton jbEditar = new JButton("Editar");
     JButton jbConfirmar = new JButton("Confirmar");
     JButton jbExcluir = new JButton("Excluir");
 
-    // Labels de exibição dos dados
+    // Labels (display)
     JLabel agencia = new JLabel();
     JLabel conta = new JLabel();
     JLabel nome = new JLabel();
@@ -66,7 +60,7 @@ public class Visualizacao extends JPanel {
     JLabel saldo = new JLabel();
     JLabel tipoConta = new JLabel();
 
-    // Labels de instrução (edição)
+    // Labels instrução (edição)
     JLabel lblAgencia = new JLabel("Agência:");
     JLabel lblConta = new JLabel("Conta:");
     JLabel lblNome = new JLabel("Nome:");
@@ -75,10 +69,9 @@ public class Visualizacao extends JPanel {
     JLabel lblCpf = new JLabel("CPF:");
     JLabel lblSaldo = new JLabel("Saldo:");
 
-    // Inputs para editar os dados
+    // Inputs (edição)
     JFormattedTextField jtfAgencia = new JFormattedTextField(mascaraAgencia);
     JFormattedTextField jtfConta = new JFormattedTextField(mascaraConta);
-    JSeparator jSeparator01 = new JSeparator();
     JTextField jtfNome = new JTextField();
     JTextField jtfEndereco = new JTextField();
     JFormattedTextField jtfTelefone = new JFormattedTextField(mascaraTelefone);
@@ -88,143 +81,198 @@ public class Visualizacao extends JPanel {
     JRadioButton jrbPoupanca = new JRadioButton("Conta Poupança");
     ButtonGroup bgContas = new ButtonGroup();
 
-    // Construtor
+    // Card panels (cada linha é um CardLayout para trocar display/edit)
+    private JPanel cardAgencia, cardConta, cardNome, cardEndereco, cardTelefone, cardCpf, cardSaldo;
+
     public Visualizacao(Janela janela) {
         this.janela = janela;
 
-        // Layout da próprio tela
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setSize(400, 305);
+        // Layout da tela
+        setLayout(new BorderLayout());
 
-        // Painel principal com layout vertical
-        painelPrincipal.setLayout(null);
-        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(8, 20, 10, 20));
+        // painel principal vertical
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
 
-        // Painel superior com FlowLayout
-        painelSuperior.setLayout(null);
-        painelSuperior.setBounds(10, 40, 450, 60);
-
-        // Painel de informações também em coluna
-        painelInfo.setBounds(10, 100, 370, 350); // Ajuste o tamanho e posição conforme desejar
-        painelInfo.setLayout(new GridLayout(0, 1));
-
-        jlTitulo.setBounds(0, 10, 400, 20);
-        jlTitulo.setHorizontalAlignment(SwingConstants.CENTER);
-
+        // título
+        jlTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        jlTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         painelPrincipal.add(jlTitulo);
+        painelPrincipal.add(Box.createVerticalStrut(10));
 
-        jcbNomes.setPreferredSize(new Dimension(200, 25));
-
+        // painel superior (combo + botões)
+        painelSuperior.setLayout(new FlowLayout(FlowLayout.LEFT, 8, 6));
+        jcbNomes.setPreferredSize(new Dimension(220, 24));
         jbConfirmar.setEnabled(false);
+        painelSuperior.add(jlInfo);
+        painelSuperior.add(jcbNomes);
+        painelSuperior.add(jbVoltar);
+        painelSuperior.add(jbEditar);
+        painelSuperior.add(jbConfirmar);
+        painelSuperior.add(jbExcluir);
+        painelPrincipal.add(painelSuperior);
+        painelPrincipal.add(Box.createVerticalStrut(10));
 
-        // Ação do botão Voltar
-        jbVoltar.addActionListener(e -> {
-            janela.mostrarFormulario();
-        });
+        // painel info (linhas)
+        painelInfo.setLayout(new BoxLayout(painelInfo, BoxLayout.Y_AXIS));
+        painelInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painelInfo.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+
+        // criar linhas (cada card substitui display/edit)
+        cardAgencia = criarLinhaInfo(agencia, lblAgencia, jtfAgencia);
+        cardConta = criarLinhaInfo(conta, lblConta, jtfConta);
+        cardNome = criarLinhaInfo(nome, lblNome, jtfNome);
+        cardEndereco = criarLinhaInfo(endereco, lblEndereco, jtfEndereco);
+        cardTelefone = criarLinhaInfo(telefone, lblTelefone, jtfTelefone);
+        cardCpf = criarLinhaInfo(cpf, lblCpf, jtfCpf);
+        cardSaldo = criarLinhaInfo(saldo, lblSaldo, jtfSaldo);
+
+        // rótulo tipoConta (apenas display)
+        tipoConta.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        painelInfo.add(cardAgencia);
+        painelInfo.add(cardConta);
+        painelInfo.add(cardNome);
+        painelInfo.add(cardEndereco);
+        painelInfo.add(cardTelefone);
+        painelInfo.add(cardCpf);
+        painelInfo.add(cardSaldo);
+        painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(tipoConta);
+
+        // radio buttons (aparecem apenas no modo edição)
+        JPanel radios = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        bgContas.add(jrbCorrente);
+        bgContas.add(jrbPoupanca);
+        jrbCorrente.setVisible(false);
+        jrbPoupanca.setVisible(false);
+        radios.add(jrbCorrente);
+        radios.add(jrbPoupanca);
+        painelInfo.add(radios);
+
+        painelPrincipal.add(painelInfo);
+        painelPrincipal.add(Box.createVerticalGlue()); // empurra conteúdo para cima
+
+        // colocar painelPrincipal dentro do scroll
+        JScrollPane scrollPane = new JScrollPane(painelPrincipal,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // define preferências de tamanho do scroll/viewport para habilitar barra
+        scrollPane.setPreferredSize(new Dimension(400, 305));
+        add(scrollPane, BorderLayout.CENTER);
+
+        // ações
+        jbVoltar.addActionListener(_ -> janela.mostrarFormulario());
         jbVoltar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(voltar, "voltar");
         jbVoltar.getActionMap().put("voltar", voltar_Action);
 
-        // Ações do Botão de Editar, Confirmar e Excluir
-        jbEditar.addActionListener(e -> Editar.habilitarEdicao(this));
-        jbConfirmar.addActionListener(e -> Editar.confirmarEdicao(this));
-        jbExcluir.addActionListener(e -> Excluir.excluirCadastro(jcbNomes, janela));
+        jbEditar.addActionListener(_ -> Editar.habilitarEdicao(this));
+        jbConfirmar.addActionListener(_ -> Editar.confirmarEdicao(this));
+        jbExcluir.addActionListener(_ -> Excluir.excluirCadastro(jcbNomes, this));
 
-        // Preencher combo com clientes já cadastrados
+        jcbNomes.addActionListener(_ -> mostrarDadosSelecionado());
+
+        // preencher lista
         atualizarListaClientes();
-
-        // Atualizar infos ao trocar de cliente
-        jcbNomes.addActionListener(e -> mostrarDadosSelecionado());
-
-        GridLayout layout = new GridLayout(1, 0);
-        layout.setHgap(8);
-        JPanel inputPanel = new JPanel();
-        inputPanel.setBounds(0, 0, 370, 25);
-        inputPanel.setLayout(layout);
-
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(layout);
-        buttonsPanel.setBounds(0, 30, 370, 25);
-
-        // Montagem do painel superior
-        inputPanel.add(jlInfo);
-        inputPanel.add(jcbNomes);
-        painelSuperior.add(inputPanel);
-        buttonsPanel.add(jbVoltar);
-        buttonsPanel.add(jbEditar);
-        buttonsPanel.add(jbConfirmar);
-        buttonsPanel.add(jbExcluir);
-        painelSuperior.add(buttonsPanel);
-
-        painelPrincipal.add(painelSuperior);
-        painelPrincipal.add(Box.createVerticalStrut(20));
-
-        // Adicionando os labels de visualização ao painel de informações
-        // painelInfo.add(agencia);
-        // painelInfo.add(conta);
-        // painelInfo.add(nome);
-        // painelInfo.add(endereco);
-        // painelInfo.add(telefone);
-        // painelInfo.add(cpf);
-        // painelInfo.add(saldo);
-        // painelInfo.add(tipoConta);
-
-        // Inputs e labels de edição (escondidos por padrão)
-        addCampoEdicao(lblAgencia, jtfAgencia);
-        addCampoEdicao(lblConta, jtfConta);
-        addCampoEdicao(lblNome, jtfNome);
-        addCampoEdicao(lblEndereco, jtfEndereco);
-        addCampoEdicao(lblTelefone, jtfTelefone);
-        addCampoEdicao(lblCpf, jtfCpf);
-        addCampoEdicao(lblSaldo, jtfSaldo);
-
-        painelInfo.add(jrbCorrente);
-        painelInfo.add(jrbPoupanca);
-        jrbCorrente.setVisible(false);
-        jrbPoupanca.setVisible(false);
-        bgContas.add(jrbCorrente);
-        bgContas.add(jrbPoupanca);
-
-        painelPrincipal.add(painelInfo);
-
-        // ScrollPane envolvendo o painel principal
-        JScrollPane scrollPane = new JScrollPane(
-                painelPrincipal,
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        add(scrollPane, BorderLayout.CENTER);
-
-        new Timer(100, e -> {
-            painelInfo.revalidate();
-            painelInfo.repaint();
-        }).start();
-
-
-        // add(painelPrincipal);
-    }
-
-    private void addCampoEdicao(JLabel label, JComponent input) {
-        label.setVisible(true);
-        input.setVisible(true);
-        painelInfo.add(label);
-        painelInfo.add(input);
-        Editar.habilitarEdicao(this);
-    }
-
-    // Método para atualizar os nomes do ComboBox a cada novo cadastro de cliente
-    public void atualizarListaClientes() {
-        jcbNomes.removeAllItems();
-        for (int i = 0; i < Gravar.listaClientes.size(); i++) {
-            jcbNomes.addItem(Gravar.listaClientes.get(i).getNome());
+        // exibir primeiro (se houver)
+        if (jcbNomes.getItemCount() > 0) {
+            jcbNomes.setSelectedIndex(0);
+            mostrarDadosSelecionado();
         }
     }
 
-    // Método para exibir os dados do cliente selecionado
+    // cria linha com CardLayout: card "display" e card "edit"
+    private JPanel criarLinhaInfo(JLabel labelExib, JLabel labelInstr, JComponent input) {
+        JPanel card = new JPanel(new CardLayout());
+        card.setAlignmentX(Component.LEFT_ALIGNMENT);
+        card.setMaximumSize(new Dimension(1000, 36)); // evita esticar horizontalmente no BoxLayout
+
+        // display panel (apenas labelExib)
+        JPanel display = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+        display.add(labelExib);
+
+        // edit panel (instrucao + input)
+        JPanel edit = new JPanel(new BorderLayout(6, 2));
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        left.add(labelInstr);
+        labelInstr.setVisible(true); // por padrão, instrução visível no edit card
+        input.setPreferredSize(new Dimension(220, 24));
+        edit.add(left, BorderLayout.WEST);
+        edit.add(input, BorderLayout.CENTER);
+
+        card.add(display, "display");
+        card.add(edit, "edit");
+
+        // comece no display
+        ((CardLayout) card.getLayout()).show(card, "display");
+        return card;
+    }
+
+    // trocar para modo edição (mostra cards "edit", preenche inputs)
+    public void enterEditModeForSelected() {
+        int idx = jcbNomes.getSelectedIndex();
+        if (idx < 0)
+            return;
+        Cliente c = Gravar.listaClientes.get(idx);
+        // preencher inputs
+        jtfAgencia.setText(c.getConta().getAgencia());
+        jtfConta.setText(c.getConta().getNumeroConta());
+        jtfNome.setText(c.getNome());
+        jtfEndereco.setText(c.getEndereco());
+        jtfTelefone.setText(c.getTelefone());
+        jtfCpf.setText(c.getCpf());
+        jtfSaldo.setText(String.valueOf(c.getConta().getSaldo()));
+        jrbCorrente.setSelected(c.getConta() instanceof ContaCorrente);
+        jrbPoupanca.setSelected(!jrbCorrente.isSelected());
+
+        // mostrar edit cards
+        ((CardLayout) cardAgencia.getLayout()).show(cardAgencia, "edit");
+        ((CardLayout) cardConta.getLayout()).show(cardConta, "edit");
+        ((CardLayout) cardNome.getLayout()).show(cardNome, "edit");
+        ((CardLayout) cardEndereco.getLayout()).show(cardEndereco, "edit");
+        ((CardLayout) cardTelefone.getLayout()).show(cardTelefone, "edit");
+        ((CardLayout) cardCpf.getLayout()).show(cardCpf, "edit");
+        ((CardLayout) cardSaldo.getLayout()).show(cardSaldo, "edit");
+
+        jrbCorrente.setVisible(true);
+        jrbPoupanca.setVisible(true);
+        jbConfirmar.setEnabled(true);
+        revalidate();
+        repaint();
+    }
+
+    // voltar para exibição (mostrar display cards e atualizar labels)
+    public void exitEditModeAndRefresh(Cliente c) {
+        // atualiza labels com cliente (pode receber cliente já atualizado)
+        mostrarDadosSelecionado(); // atualiza labels a partir do combo index atual
+
+        ((CardLayout) cardAgencia.getLayout()).show(cardAgencia, "display");
+        ((CardLayout) cardConta.getLayout()).show(cardConta, "display");
+        ((CardLayout) cardNome.getLayout()).show(cardNome, "display");
+        ((CardLayout) cardEndereco.getLayout()).show(cardEndereco, "display");
+        ((CardLayout) cardTelefone.getLayout()).show(cardTelefone, "display");
+        ((CardLayout) cardCpf.getLayout()).show(cardCpf, "display");
+        ((CardLayout) cardSaldo.getLayout()).show(cardSaldo, "display");
+
+        jrbCorrente.setVisible(false);
+        jrbPoupanca.setVisible(false);
+        jbConfirmar.setEnabled(false);
+        revalidate();
+        repaint();
+    }
+
+    // Atualiza a lista do combo
+    public void atualizarListaClientes() {
+        jcbNomes.removeAllItems();
+        for (Cliente c : Gravar.listaClientes)
+            jcbNomes.addItem(c.getNome());
+    }
+
+    // Preenche labels a partir do cliente selecionado
     public void mostrarDadosSelecionado() {
         int indice = jcbNomes.getSelectedIndex();
         if (indice >= 0 && indice < Gravar.listaClientes.size()) {
             Cliente cliente = Gravar.listaClientes.get(indice);
-            System.out.print(cliente.getNome());
             agencia.setText("Agência: " + cliente.getConta().getAgencia());
             conta.setText("Conta: " + cliente.getConta().getNumeroConta());
             nome.setText("Nome: " + cliente.getNome());
@@ -232,15 +280,24 @@ public class Visualizacao extends JPanel {
             telefone.setText("Telefone: " + cliente.getTelefone());
             cpf.setText("CPF: " + cliente.getCpf());
             saldo.setText(String.format("Saldo: R$ %.2f", cliente.getConta().getSaldo()));
-            tipoConta.setText("Tipo de Conta: " +
-                    (cliente.getConta() instanceof ContaCorrente ? "Conta Corrente" : "Conta Poupança"));
-
+            tipoConta.setText("Tipo de Conta: "
+                    + (cliente.getConta() instanceof ContaCorrente ? "Conta Corrente" : "Conta Poupança"));
+        } else {
+            // limpa
+            agencia.setText("");
+            conta.setText("");
+            nome.setText("");
+            endereco.setText("");
+            telefone.setText("");
+            cpf.setText("");
+            saldo.setText("");
+            tipoConta.setText("");
         }
         revalidate();
         repaint();
     }
 
-    // Configuração dos Atalhos
+    // atalhos
     Action voltar_Action = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -248,73 +305,13 @@ public class Visualizacao extends JPanel {
         }
     };
 
-    // Getters para o Editar.java acessar
+    // getters usados por Editar / Excluir
     public JComboBox<String> getJcbNomes() {
         return jcbNomes;
     }
 
     public JButton getJbConfirmar() {
         return jbConfirmar;
-    }
-
-    public JLabel getAgencia() {
-        return agencia;
-    }
-
-    public JLabel getConta() {
-        return conta;
-    }
-
-    public JLabel getNome() {
-        return nome;
-    }
-
-    public JLabel getEndereco() {
-        return endereco;
-    }
-
-    public JLabel getTelefone() {
-        return telefone;
-    }
-
-    public JLabel getCpf() {
-        return cpf;
-    }
-
-    public JLabel getSaldo() {
-        return saldo;
-    }
-
-    public JLabel getTipoConta() {
-        return tipoConta;
-    }
-
-    public JLabel getLblAgencia() {
-        return lblAgencia;
-    }
-
-    public JLabel getLblConta() {
-        return lblConta;
-    }
-
-    public JLabel getLblNome() {
-        return lblNome;
-    }
-
-    public JLabel getLblEndereco() {
-        return lblEndereco;
-    }
-
-    public JLabel getLblTelefone() {
-        return lblTelefone;
-    }
-
-    public JLabel getLblCpf() {
-        return lblCpf;
-    }
-
-    public JLabel getLblSaldo() {
-        return lblSaldo;
     }
 
     public JFormattedTextField getJtfAgencia() {
@@ -351,5 +348,14 @@ public class Visualizacao extends JPanel {
 
     public JRadioButton getJrbPoupanca() {
         return jrbPoupanca;
+    }
+
+    // métodos para Editar chamar
+    public void enterEditMode() {
+        enterEditModeForSelected();
+    }
+
+    public void exitEditMode(Cliente c) {
+        exitEditModeAndRefresh(c);
     }
 }
