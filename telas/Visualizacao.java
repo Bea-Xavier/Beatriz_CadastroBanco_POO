@@ -12,8 +12,8 @@ import objetos.usuarios.Cliente;
 import objetos.contas.ContaCorrente;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 public class Visualizacao extends JPanel {
@@ -94,81 +94,79 @@ public class Visualizacao extends JPanel {
 
         // Layout da próprio tela
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setSize(400, 305);
 
         // Painel principal com layout vertical
-        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setLayout(null);
         painelPrincipal.setBorder(BorderFactory.createEmptyBorder(8, 20, 10, 20));
 
         // Painel superior com FlowLayout
-        painelSuperior.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        painelSuperior.setLayout(null);
+        painelSuperior.setBounds(10, 40, 450, 60);
 
         // Painel de informações também em coluna
-        painelInfo.setLayout(new BoxLayout(painelInfo, BoxLayout.Y_AXIS));
+        painelInfo.setBounds(10, 100, 370, 350); // Ajuste o tamanho e posição conforme desejar
+        painelInfo.setLayout(new GridLayout(0, 1));
 
-        jlTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        jlTitulo.setBounds(0, 10, 400, 20);
+        jlTitulo.setHorizontalAlignment(SwingConstants.CENTER);
 
         painelPrincipal.add(jlTitulo);
-        painelPrincipal.add(Box.createVerticalStrut(15));
 
         jcbNomes.setPreferredSize(new Dimension(200, 25));
 
         jbConfirmar.setEnabled(false);
 
-        // agencia.setAlignmentX(CENTER_ALIGNMENT);
-        // conta.setAlignmentX(CENTER_ALIGNMENT);
-        // nome.setAlignmentX(CENTER_ALIGNMENT);
-        // endereco.setAlignmentX(CENTER_ALIGNMENT);
-        // telefone.setAlignmentX(CENTER_ALIGNMENT);
-        // cpf.setAlignmentX(CENTER_ALIGNMENT);
-        // saldo.setAlignmentX(CENTER_ALIGNMENT);
-        // tipoConta.setAlignmentX(CENTER_ALIGNMENT);
-
-        // jtfAgencia.setAlignmentX(CENTER_ALIGNMENT);
-        // jtfConta.setAlignmentX(CENTER_ALIGNMENT);
-        // jtfNome.setAlignmentX(CENTER_ALIGNMENT);
-        // jtfEndereco.setAlignmentX(CENTER_ALIGNMENT);
-        // jtfTelefone.setAlignmentX(CENTER_ALIGNMENT);
-        // jtfCpf.setAlignmentX(CENTER_ALIGNMENT);
-        // jtfSaldo.setAlignmentX(CENTER_ALIGNMENT);
-
         // Ação do botão Voltar
-        jbVoltar.addActionListener(_ -> {
+        jbVoltar.addActionListener(e -> {
             janela.mostrarFormulario();
         });
         jbVoltar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(voltar, "voltar");
         jbVoltar.getActionMap().put("voltar", voltar_Action);
 
         // Ações do Botão de Editar, Confirmar e Excluir
-        jbEditar.addActionListener(_ -> Editar.habilitarEdicao(this));
-        jbConfirmar.addActionListener(_ -> Editar.confirmarEdicao(this));
-        jbExcluir.addActionListener(_ -> Excluir.excluirCadastro(jcbNomes, janela));
+        jbEditar.addActionListener(e -> Editar.habilitarEdicao(this));
+        jbConfirmar.addActionListener(e -> Editar.confirmarEdicao(this));
+        jbExcluir.addActionListener(e -> Excluir.excluirCadastro(jcbNomes, janela));
 
         // Preencher combo com clientes já cadastrados
         atualizarListaClientes();
 
         // Atualizar infos ao trocar de cliente
-        jcbNomes.addActionListener(_ -> mostrarDadosSelecionado());
+        jcbNomes.addActionListener(e -> mostrarDadosSelecionado());
+
+        GridLayout layout = new GridLayout(1, 0);
+        layout.setHgap(8);
+        JPanel inputPanel = new JPanel();
+        inputPanel.setBounds(0, 0, 370, 25);
+        inputPanel.setLayout(layout);
+
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(layout);
+        buttonsPanel.setBounds(0, 30, 370, 25);
 
         // Montagem do painel superior
-        painelSuperior.add(jlInfo);
-        painelSuperior.add(jcbNomes);
-        painelSuperior.add(jbVoltar);
-        painelSuperior.add(jbEditar);
-        painelSuperior.add(jbConfirmar);
-        painelSuperior.add(jbExcluir);
+        inputPanel.add(jlInfo);
+        inputPanel.add(jcbNomes);
+        painelSuperior.add(inputPanel);
+        buttonsPanel.add(jbVoltar);
+        buttonsPanel.add(jbEditar);
+        buttonsPanel.add(jbConfirmar);
+        buttonsPanel.add(jbExcluir);
+        painelSuperior.add(buttonsPanel);
 
         painelPrincipal.add(painelSuperior);
         painelPrincipal.add(Box.createVerticalStrut(20));
 
         // Adicionando os labels de visualização ao painel de informações
-        painelInfo.add(agencia);
-        painelInfo.add(conta);
-        painelInfo.add(nome);
-        painelInfo.add(endereco);
-        painelInfo.add(telefone);
-        painelInfo.add(cpf);
-        painelInfo.add(saldo);
-        painelInfo.add(tipoConta);
+        // painelInfo.add(agencia);
+        // painelInfo.add(conta);
+        // painelInfo.add(nome);
+        // painelInfo.add(endereco);
+        // painelInfo.add(telefone);
+        // painelInfo.add(cpf);
+        // painelInfo.add(saldo);
+        // painelInfo.add(tipoConta);
 
         // Inputs e labels de edição (escondidos por padrão)
         addCampoEdicao(lblAgencia, jtfAgencia);
@@ -191,17 +189,26 @@ public class Visualizacao extends JPanel {
         // ScrollPane envolvendo o painel principal
         JScrollPane scrollPane = new JScrollPane(
                 painelPrincipal,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         add(scrollPane, BorderLayout.CENTER);
+
+        new Timer(100, e -> {
+            painelInfo.revalidate();
+            painelInfo.repaint();
+        }).start();
+
+
+        // add(painelPrincipal);
     }
 
     private void addCampoEdicao(JLabel label, JComponent input) {
-        label.setVisible(false);
-        input.setVisible(false);
+        label.setVisible(true);
+        input.setVisible(true);
         painelInfo.add(label);
         painelInfo.add(input);
+        Editar.habilitarEdicao(this);
     }
 
     // Método para atualizar os nomes do ComboBox a cada novo cadastro de cliente
@@ -217,6 +224,7 @@ public class Visualizacao extends JPanel {
         int indice = jcbNomes.getSelectedIndex();
         if (indice >= 0 && indice < Gravar.listaClientes.size()) {
             Cliente cliente = Gravar.listaClientes.get(indice);
+            System.out.print(cliente.getNome());
             agencia.setText("Agência: " + cliente.getConta().getAgencia());
             conta.setText("Conta: " + cliente.getConta().getNumeroConta());
             nome.setText("Nome: " + cliente.getNome());
@@ -226,7 +234,10 @@ public class Visualizacao extends JPanel {
             saldo.setText(String.format("Saldo: R$ %.2f", cliente.getConta().getSaldo()));
             tipoConta.setText("Tipo de Conta: " +
                     (cliente.getConta() instanceof ContaCorrente ? "Conta Corrente" : "Conta Poupança"));
+
         }
+        revalidate();
+        repaint();
     }
 
     // Configuração dos Atalhos
