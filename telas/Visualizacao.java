@@ -14,11 +14,14 @@ import objetos.contas.ContaCorrente;
 public class Visualizacao extends JPanel {
     private Janela janela;
 
+    // painéis
     JPanel painelPrincipal = new JPanel();
-    JPanel painelSuperior = new JPanel();
-    JPanel painelInfo = new JPanel();
+    JPanel painelHeader = new JPanel(); // contém título
+    JPanel painelSelecao = new JPanel(); // linha: label + combo
+    JPanel painelBotoes = new JPanel(); // linha: botões
+    JPanel painelInfo = new JPanel(); // cards (display/edit)
 
-    // Máscaras
+    // máscaras
     MaskFormatter mascaraAgencia, mascaraConta, mascaraTelefone, mascaraCpf, mascaraSaldo;
     {
         try {
@@ -37,20 +40,25 @@ public class Visualizacao extends JPanel {
         }
     }
 
-    KeyStroke voltar = KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.ALT_DOWN_MASK);
+    // criação dos atalhps
 
-    // Cabeçalho
+    KeyStroke voltar = KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.ALT_DOWN_MASK);
+    KeyStroke editar = KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.ALT_DOWN_MASK);
+    KeyStroke confirmar = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK);
+    KeyStroke excluir = KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.ALT_DOWN_MASK);
+
+    // cabeçalho
     JLabel jlTitulo = new JLabel("Consulta de Cadastro");
     JLabel jlInfo = new JLabel("Escolha o nome do cliente:");
     JComboBox<String> jcbNomes = new JComboBox<>();
 
-    // Botões
+    // botões
     JButton jbVoltar = new JButton("Voltar");
     JButton jbEditar = new JButton("Editar");
     JButton jbConfirmar = new JButton("Confirmar");
     JButton jbExcluir = new JButton("Excluir");
 
-    // Labels (display)
+    // display labels
     JLabel agencia = new JLabel();
     JLabel conta = new JLabel();
     JLabel nome = new JLabel();
@@ -60,7 +68,7 @@ public class Visualizacao extends JPanel {
     JLabel saldo = new JLabel();
     JLabel tipoConta = new JLabel();
 
-    // Labels instrução (edição)
+    // labels de instrução (edição)
     JLabel lblAgencia = new JLabel("Agência:");
     JLabel lblConta = new JLabel("Conta:");
     JLabel lblNome = new JLabel("Nome:");
@@ -69,7 +77,7 @@ public class Visualizacao extends JPanel {
     JLabel lblCpf = new JLabel("CPF:");
     JLabel lblSaldo = new JLabel("Saldo:");
 
-    // Inputs (edição)
+    // inputs de edição
     JFormattedTextField jtfAgencia = new JFormattedTextField(mascaraAgencia);
     JFormattedTextField jtfConta = new JFormattedTextField(mascaraConta);
     JTextField jtfNome = new JTextField();
@@ -81,44 +89,51 @@ public class Visualizacao extends JPanel {
     JRadioButton jrbPoupanca = new JRadioButton("Conta Poupança");
     ButtonGroup bgContas = new ButtonGroup();
 
-    // Card panels (cada linha é um CardLayout para trocar display/edit)
+    // cards por linha (cada linha é um CardLayout para trocar display/edit)
     private JPanel cardAgencia, cardConta, cardNome, cardEndereco, cardTelefone, cardCpf, cardSaldo;
 
     public Visualizacao(Janela janela) {
         this.janela = janela;
 
-        // Layout da tela
+        // layout principal do panel (coloca o scroll no center)
         setLayout(new BorderLayout());
 
-        // painel principal vertical
+        // painelPrincipal organiza conteúdo verticalmente e centraliza internamente
         painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
-        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(8, 12, 12, 12));
+        painelPrincipal.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 0));
 
-        // título
-        jlTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jlTitulo.setFont(new Font("Arial", Font.BOLD, 14));
-        painelPrincipal.add(jlTitulo);
+        // --- header (título) ---
+        painelHeader.setLayout(new FlowLayout(FlowLayout.CENTER));
+        jlTitulo.setFont(new Font("Arial", Font.BOLD, 16));
+        painelHeader.add(jlTitulo);
+        painelPrincipal.add(painelHeader);
         painelPrincipal.add(Box.createVerticalStrut(10));
 
-        // painel superior (combo + botões)
-        painelSuperior.setLayout(new FlowLayout(FlowLayout.LEFT, 8, 6));
-        jcbNomes.setPreferredSize(new Dimension(220, 24));
+        // --- seleção (rótulo + combobox) ---
+        painelSelecao.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        jlInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        jcbNomes.setPreferredSize(new Dimension(190, 22));
+        painelSelecao.add(jlInfo);
+        painelSelecao.add(jcbNomes);
+        painelPrincipal.add(painelSelecao);
+        painelPrincipal.add(Box.createVerticalStrut(8));
+
+        // --- botões (linha separada, centrada) ---
+        painelBotoes.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 6));
         jbConfirmar.setEnabled(false);
-        painelSuperior.add(jlInfo);
-        painelSuperior.add(jcbNomes);
-        painelSuperior.add(jbVoltar);
-        painelSuperior.add(jbEditar);
-        painelSuperior.add(jbConfirmar);
-        painelSuperior.add(jbExcluir);
-        painelPrincipal.add(painelSuperior);
-        painelPrincipal.add(Box.createVerticalStrut(10));
+        painelBotoes.add(jbVoltar);
+        painelBotoes.add(jbEditar);
+        painelBotoes.add(jbConfirmar);
+        painelBotoes.add(jbExcluir);
+        painelPrincipal.add(painelBotoes);
+        painelPrincipal.add(Box.createVerticalStrut(12));
 
-        // painel info (linhas)
+        // --- painelInfo: que irá conter os cards
         painelInfo.setLayout(new BoxLayout(painelInfo, BoxLayout.Y_AXIS));
-        painelInfo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        painelInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
         painelInfo.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
-        // criar linhas (cada card substitui display/edit)
+        // linhas (cada card substitui display/edit)
         cardAgencia = criarLinhaInfo(agencia, lblAgencia, jtfAgencia);
         cardConta = criarLinhaInfo(conta, lblConta, jtfConta);
         cardNome = criarLinhaInfo(nome, lblNome, jtfNome);
@@ -127,94 +142,115 @@ public class Visualizacao extends JPanel {
         cardCpf = criarLinhaInfo(cpf, lblCpf, jtfCpf);
         cardSaldo = criarLinhaInfo(saldo, lblSaldo, jtfSaldo);
 
-        // rótulo tipoConta (apenas display)
-        tipoConta.setAlignmentX(Component.LEFT_ALIGNMENT);
-
+        // adiciona as linhas (com espaçamento)
         painelInfo.add(cardAgencia);
-        painelInfo.add(cardConta);
-        painelInfo.add(cardNome);
-        painelInfo.add(cardEndereco);
-        painelInfo.add(cardTelefone);
-        painelInfo.add(cardCpf);
-        painelInfo.add(cardSaldo);
         painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(cardConta);
+        painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(cardNome);
+        painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(cardEndereco);
+        painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(cardTelefone);
+        painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(cardCpf);
+        painelInfo.add(Box.createVerticalStrut(6));
+        painelInfo.add(cardSaldo);
+        painelInfo.add(Box.createVerticalStrut(8));
+
+        // tipo de conta (apenas display)
+        tipoConta.setAlignmentX(Component.CENTER_ALIGNMENT);
         painelInfo.add(tipoConta);
 
-        // radio buttons (aparecem apenas no modo edição)
-        JPanel radios = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        // radios (aparecem só no modo edição)
+        JPanel radios = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 2));
         bgContas.add(jrbCorrente);
         bgContas.add(jrbPoupanca);
         jrbCorrente.setVisible(false);
         jrbPoupanca.setVisible(false);
         radios.add(jrbCorrente);
         radios.add(jrbPoupanca);
+        painelInfo.add(Box.createVerticalStrut(8));
         painelInfo.add(radios);
 
         painelPrincipal.add(painelInfo);
         painelPrincipal.add(Box.createVerticalGlue()); // empurra conteúdo para cima
 
-        // colocar painelPrincipal dentro do scroll
+        // --- scroll ---
         JScrollPane scrollPane = new JScrollPane(painelPrincipal,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        // define preferências de tamanho do scroll/viewport para habilitar barra
-        scrollPane.setPreferredSize(new Dimension(400, 305));
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(420, 340)); // mantém janela do tamanho desejado
         add(scrollPane, BorderLayout.CENTER);
 
-        // ações
+        // --- ações dos botões ---
         jbVoltar.addActionListener(_ -> janela.mostrarFormulario());
         jbVoltar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(voltar, "voltar");
         jbVoltar.getActionMap().put("voltar", voltar_Action);
 
         jbEditar.addActionListener(_ -> Editar.habilitarEdicao(this));
+        jbEditar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(editar, "editar");
+        jbEditar.getActionMap().put("editar", editar_Action);
+
         jbConfirmar.addActionListener(_ -> Editar.confirmarEdicao(this));
+        jbConfirmar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(confirmar, "confirmar");
+        jbConfirmar.getActionMap().put("confirmar", confirmar_Action);
+
         jbExcluir.addActionListener(_ -> Excluir.excluirCadastro(jcbNomes, this));
+        jbExcluir.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(excluir, "excluir");
+        jbExcluir.getActionMap().put("excluir", excluir_Action);
 
         jcbNomes.addActionListener(_ -> mostrarDadosSelecionado());
 
-        // preencher lista
+        // preencher lista e mostrar primeiro item se houver
         atualizarListaClientes();
-        // exibir primeiro (se houver)
         if (jcbNomes.getItemCount() > 0) {
             jcbNomes.setSelectedIndex(0);
             mostrarDadosSelecionado();
         }
     }
 
-    // cria linha com CardLayout: card "display" e card "edit"
+    // cria linha com CardLayout: "display" e "edit"
     private JPanel criarLinhaInfo(JLabel labelExib, JLabel labelInstr, JComponent input) {
         JPanel card = new JPanel(new CardLayout());
-        card.setAlignmentX(Component.LEFT_ALIGNMENT);
-        card.setMaximumSize(new Dimension(1000, 36)); // evita esticar horizontalmente no BoxLayout
+        card.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.setMaximumSize(new Dimension(380, 36)); // limita largura para centralizar bem
 
         // display panel (apenas labelExib)
-        JPanel display = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+        JPanel display = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        display.setOpaque(false);
+        labelExib.setFont(labelExib.getFont().deriveFont(Font.PLAIN));
         display.add(labelExib);
 
-        // edit panel (instrucao + input)
-        JPanel edit = new JPanel(new BorderLayout(6, 2));
+        // edit panel (instrucao + input) - centralizado
+        JPanel edit = new JPanel(new BorderLayout(6, 0));
+        edit.setOpaque(false);
+        labelInstr.setVisible(true);
+        labelInstr.setHorizontalAlignment(SwingConstants.LEFT);
+        input.setPreferredSize(new Dimension(240, 24));
         JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        left.setOpaque(false);
         left.add(labelInstr);
-        labelInstr.setVisible(true); // por padrão, instrução visível no edit card
-        input.setPreferredSize(new Dimension(220, 24));
         edit.add(left, BorderLayout.WEST);
         edit.add(input, BorderLayout.CENTER);
 
         card.add(display, "display");
         card.add(edit, "edit");
 
-        // comece no display
+        // começar em display
         ((CardLayout) card.getLayout()).show(card, "display");
         return card;
     }
 
-    // trocar para modo edição (mostra cards "edit", preenche inputs)
-    public void enterEditModeForSelected() {
+    // ativar modo edição: mostra os cards "edit" e preenche inputs
+    public void enterEditMode() {
         int idx = jcbNomes.getSelectedIndex();
-        if (idx < 0)
+        if (idx < 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um cliente para editar.", "Atenção",
+                    JOptionPane.WARNING_MESSAGE);
             return;
+        }
         Cliente c = Gravar.listaClientes.get(idx);
-        // preencher inputs
         jtfAgencia.setText(c.getConta().getAgencia());
         jtfConta.setText(c.getConta().getNumeroConta());
         jtfNome.setText(c.getNome());
@@ -225,7 +261,6 @@ public class Visualizacao extends JPanel {
         jrbCorrente.setSelected(c.getConta() instanceof ContaCorrente);
         jrbPoupanca.setSelected(!jrbCorrente.isSelected());
 
-        // mostrar edit cards
         ((CardLayout) cardAgencia.getLayout()).show(cardAgencia, "edit");
         ((CardLayout) cardConta.getLayout()).show(cardConta, "edit");
         ((CardLayout) cardNome.getLayout()).show(cardNome, "edit");
@@ -241,11 +276,10 @@ public class Visualizacao extends JPanel {
         repaint();
     }
 
-    // voltar para exibição (mostrar display cards e atualizar labels)
+    // sair do modo edição atualizando display recebe cliente atualizado
     public void exitEditModeAndRefresh(Cliente c) {
-        // atualiza labels com cliente (pode receber cliente já atualizado)
-        mostrarDadosSelecionado(); // atualiza labels a partir do combo index atual
-
+        // atualiza lista/labels
+        mostrarDadosSelecionado();
         ((CardLayout) cardAgencia.getLayout()).show(cardAgencia, "display");
         ((CardLayout) cardConta.getLayout()).show(cardConta, "display");
         ((CardLayout) cardNome.getLayout()).show(cardNome, "display");
@@ -261,14 +295,16 @@ public class Visualizacao extends JPanel {
         repaint();
     }
 
-    // Atualiza a lista do combo
+    // atualiza a lista dos nomes no comboBox
+
     public void atualizarListaClientes() {
         jcbNomes.removeAllItems();
         for (Cliente c : Gravar.listaClientes)
             jcbNomes.addItem(c.getNome());
     }
 
-    // Preenche labels a partir do cliente selecionado
+    // exibe os dados cadastrados nos labels de display
+
     public void mostrarDadosSelecionado() {
         int indice = jcbNomes.getSelectedIndex();
         if (indice >= 0 && indice < Gravar.listaClientes.size()) {
@@ -283,7 +319,6 @@ public class Visualizacao extends JPanel {
             tipoConta.setText("Tipo de Conta: "
                     + (cliente.getConta() instanceof ContaCorrente ? "Conta Corrente" : "Conta Poupança"));
         } else {
-            // limpa
             agencia.setText("");
             conta.setText("");
             nome.setText("");
@@ -305,7 +340,28 @@ public class Visualizacao extends JPanel {
         }
     };
 
-    // getters usados por Editar / Excluir
+    Action editar_Action = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            jbEditar.doClick();
+        }
+    };
+
+    Action confirmar_Action = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            jbConfirmar.doClick();
+        }
+    };
+
+    Action excluir_Action = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            jbExcluir.doClick();
+        }
+    };
+
+    // getters para Editar e Excluir
     public JComboBox<String> getJcbNomes() {
         return jcbNomes;
     }
@@ -350,12 +406,12 @@ public class Visualizacao extends JPanel {
         return jrbPoupanca;
     }
 
-    // métodos para Editar chamar
-    public void enterEditMode() {
-        enterEditModeForSelected();
+    // métodos auxiliares chamados por Editar
+    public void enterEditModePublic() {
+        enterEditMode();
     }
 
-    public void exitEditMode(Cliente c) {
+    public void exitEditModePublic(Cliente c) {
         exitEditModeAndRefresh(c);
     }
 }

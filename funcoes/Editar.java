@@ -52,7 +52,7 @@ public class Editar {
         tela.getJcbNomes().setSelectedIndex(indice); // manter seleção
 
         // volta para modo display e atualiza labels
-        tela.exitEditMode(cliente);
+        tela.exitEditModePublic(cliente);
 
         JOptionPane.showMessageDialog(null, "Cadastro atualizado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
     }
